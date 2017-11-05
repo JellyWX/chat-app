@@ -31,13 +31,13 @@ def chat_server():
 
     for s in readable:
 
-      elif s == server:
+      if s == server:
         sock, addr = server.accept()
         SOCKS.append(sock)
         print('{} connected to server\n'.format(addr))
 
         nicknames[sock] = addr
-        broadcast(s,'{} connected to server\n'.format(addr))
+        broadcast(s,'{} connected to server'.format(addr))
 
       else:
 
@@ -57,14 +57,14 @@ def chat_server():
           else:
             broadcast(s,'{}: {}'.format(nicknames[s],plaintext))
         else:
-          broadcast(s,'{} killed the connection\n'.format(s.getpeername()))
+          broadcast(s,'{} killed the connection'.format(s.getpeername()))
           print('{} killed the connection\n'.format(s.getpeername()))
           if s in SOCKS:
             SOCKS.remove(s)
           s.close()
 
     for s in exception:
-      broadcast(s,'{} killed the connection\n'.format(s.getpeername()))
+      broadcast(s,'{} killed the connection'.format(s.getpeername()))
       print('{} killed the connection\n'.format(s.getpeername()))
       if s in SOCKS:
         SOCKS.remove(s)
@@ -74,7 +74,7 @@ def chat_server():
 def broadcast(sock,message):
   global server, SOCKS
   for s in SOCKS:
-    if s not in [sock,server]:
+    if s != server:
       try:
         s.send(enc.encrypt(message))
       except:

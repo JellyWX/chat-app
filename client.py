@@ -4,21 +4,19 @@ import sys
 
 from encrypt import AESCipher
 
-client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-client.settimeout(2)
-server_addr = ('localhost', 46643)
-
-passwd = input('Please enter the server password now, or press enter for none: ')
-
-enc = AESCipher(passwd)
-
-try:
-  client.connect(server_addr)
-except:
-  print('Unable to establish connection')
-
 def chat_client():
-  global client
+  client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+  client.settimeout(2)
+  server_addr = ('localhost', 46643)
+
+  #passwd = input('Please enter the server password now, or press enter for none: ')
+
+  enc = AESCipher(passwd)
+
+  try:
+    client.connect(server_addr)
+  except:
+    print('Unable to establish connection')
 
   print('Welcome to the server. Type `/nick ` to set your nickname on this server.')
 

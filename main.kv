@@ -1,6 +1,9 @@
 <Chat>:
+  tout: tout
+  tin: tin
+  send_btn: send_btn
+
   Label:
-    halign: 'left'
     id: tout
     width: root.width
     height: root.height
@@ -13,13 +16,12 @@
     height: root.height * 0.06
 
   Button:
-    id: send
+    id: send_btn
     width: root.width * 0.1
     height: root.height * 0.06
     x: root.width * 0.9
     text: 'Send!'
-    on_press: print('hello world')
-
+    on_press: root.send_msg()
 
 <Manager>:
 
