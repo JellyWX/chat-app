@@ -1,0 +1,29 @@
+<Chat>:
+  Label:
+    halign: 'left'
+    id: tout
+    width: root.width
+    height: root.height
+    y: root.height * 0.06
+    text: 'Messages will appear here'
+
+  TextInput:
+    id: tin
+    width: root.width * 0.9
+    height: root.height * 0.06
+
+  Button:
+    id: send
+    width: root.width * 0.1
+    height: root.height * 0.06
+    x: root.width * 0.9
+    text: 'Send!'
+    on_press: print('hello world')
+
+
+<Manager>:
+
+  Screen:
+    name: 'chat'
+    Chat:
+      id: chat
