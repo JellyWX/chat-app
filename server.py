@@ -27,53 +27,57 @@ def chat_server():
   global SOCKS, nicknames, passwd
   while SOCKS:
 
-    try:
+    readable, writable, exception = select.select(SOCKS,[],[],0)
 
-      readable, writable, exception = select.select(SOCKS,[],[],0)
+    for s in readable:
 
-      for s in readable:
+      if s == server:
+        sock, addr = server.accept()
+        SOCKS.append(sock)
+        print('{} connected to server\n'.format(addr))
 
-        if s == server:
-          sock, addr = server.accept()
-          SOCKS.append(sock)
-          print('{} connected to server\n'.format(addr))
+        nicknames[sock] = addr
+        broadcast(s,'{} connected to server'.format(addr))
 
-          nicknames[sock] = addr
-          broadcast(s,'{} connected to server'.format(addr))
-
-        else:
-
+      else:
+        
+        try:
           data = s.recv(4096)
+        except ConnectionResetError:
+          broadcast(s,'{} killed the connection'.format(nicknames[s]))
+          print('{} killed the connection\n'.format(nicknames[s]))
+          if s in SOCKS:
+            SOCKS.remove(s)
+          s.close()
+          continue
+          
+        try:
+          plaintext = enc.decrypt(data)
+          assert plaintext
+        except:
+          plaintext = 'User has sent message using an incorrect password\n'
 
-          try:
-            plaintext = enc.decrypt(data)
-            assert plaintext
-          except:
-            plaintext = 'User has sent message using an incorrect password\n'
+        if data:
+          if plaintext.startswith('/nick '):
+            broadcast(s,'{} changed their nickname to {}'.format(nicknames[s],plaintext[6:]))
+            nicknames[s] = plaintext[6:].strip()
 
-          if data:
-            if plaintext.startswith('/nick '):
-              broadcast(s,'{} changed their nickname to {}'.format(nicknames[s],plaintext[6:]))
-              nicknames[s] = plaintext[6:].strip()
-
-            else:
-              broadcast(s,'{}: {}'.format(nicknames[s],plaintext))
           else:
-            broadcast(s,'{} killed the connection'.format(nicknames[s]))
-            print('{} killed the connection\n'.format(s.getpeername()))
-            if s in SOCKS:
-              SOCKS.remove(s)
-            s.close()
+            broadcast(s,'{}: {}'.format(nicknames[s],plaintext))
+        else:
+          broadcast(s,'{} killed the connection'.format(nicknames[s]))
+          print('{} killed the connection\n'.format(s.getpeername()))
+          if s in SOCKS:
+            SOCKS.remove(s)
+          s.close()
 
-      for s in exception:
-        broadcast(s,'{} killed the connection'.format(s.getpeername()))
-        print('{} killed the connection\n'.format(s.getpeername()))
-        if s in SOCKS:
-          SOCKS.remove(s)
-        s.close()
+    for s in exception:
+      broadcast(s,'{} killed the connection'.format(s.getpeername()))
+      print('{} killed the connection\n'.format(s.getpeername()))
+      if s in SOCKS:
+        SOCKS.remove(s)
+      s.close()
 
-    except Exception as e:
-      print('Exception occured in main loop: {}'.format(e))
 
 def broadcast(sock,message):
   global server, SOCKS
