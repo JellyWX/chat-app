@@ -14,7 +14,7 @@ class Chat(Widget):
   tin = ObjectProperty(None)
   send_btn = ObjectProperty(None)
 
-  message_buffer = ''
+
 
   def __init__(self, *args, **kwargs):
     super(Chat, self).__init__(*args, **kwargs)
