@@ -3,24 +3,27 @@
   tin: tin
   send_btn: send_btn
 
-  Label:
+  TextInput:
     id: tout
     width: root.width
-    height: root.height
+    height: root.height * 0.94
     y: root.height * 0.06
-    text: 'Messages will appear here'
+    text: 'Use the command `/help` to view this server\'s commands. Use #passwd <password> if the server you\'re connecting to has encryption.'
 
   TextInput:
     id: tin
+    focus: True
+    multiline: False
     width: root.width * 0.9
     height: root.height * 0.06
+    on_text_validate: root.send_msg()
 
   Button:
     id: send_btn
     width: root.width * 0.1
     height: root.height * 0.06
     x: root.width * 0.9
-    text: 'Send!'
+    text: 'Send'
     on_press: root.send_msg()
 
 <Manager>:

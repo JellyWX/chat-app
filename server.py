@@ -34,28 +34,28 @@ def chat_server():
       if s == server:
         sock, addr = server.accept()
         SOCKS.append(sock)
-        print('{} connected to server\n'.format(addr))
+        print('{} connected to server'.format(addr))
 
         nicknames[sock] = addr
         broadcast(s,'{} connected to server'.format(addr))
 
       else:
-        
+
         try:
           data = s.recv(4096)
         except ConnectionResetError:
           broadcast(s,'{} killed the connection'.format(nicknames[s]))
-          print('{} killed the connection\n'.format(nicknames[s]))
+          print('{} killed the connection'.format(nicknames[s]))
           if s in SOCKS:
             SOCKS.remove(s)
           s.close()
           continue
-          
+
         try:
           plaintext = enc.decrypt(data)
           assert plaintext
         except:
-          plaintext = 'User has sent message using an incorrect password\n'
+          continue
 
         if data:
           if plaintext.startswith('/nick '):
@@ -66,14 +66,14 @@ def chat_server():
             broadcast(s,'{}: {}'.format(nicknames[s],plaintext))
         else:
           broadcast(s,'{} killed the connection'.format(nicknames[s]))
-          print('{} killed the connection\n'.format(s.getpeername()))
+          print('{} killed the connection\n'.format(nicknames[s]))
           if s in SOCKS:
             SOCKS.remove(s)
           s.close()
 
     for s in exception:
-      broadcast(s,'{} killed the connection'.format(s.getpeername()))
-      print('{} killed the connection\n'.format(s.getpeername()))
+      broadcast(s,'{} killed the connection'.format(nicknames[s]))
+      print('{} killed the connection'.format(nicknames[s]))
       if s in SOCKS:
         SOCKS.remove(s)
       s.close()
@@ -81,6 +81,7 @@ def chat_server():
 
 def broadcast(sock,message):
   global server, SOCKS
+
   for s in SOCKS:
     if s != server:
       try:

@@ -7,14 +7,13 @@ from kivy.clock import Clock
 
 import select
 import socket
+import sys
 from encrypt import AESCipher
 
 class Chat(Widget):
   tout = ObjectProperty(None)
   tin = ObjectProperty(None)
   send_btn = ObjectProperty(None)
-
-
 
   def __init__(self, *args, **kwargs):
     super(Chat, self).__init__(*args, **kwargs)
@@ -33,24 +32,33 @@ class Chat(Widget):
     except:
       print('Unable to establish connection')
 
-    print('Welcome to the server. Type `/nick ` to set your nickname on this server.')
-
     Clock.schedule_interval(self.chat_client, 0)
 
   def chat_client(self,e):
+    self.tin.focus = True
 
     readable, writable, exception = select.select([self.client],[],[],0)
 
     if self.client in readable:
       data = self.client.recv(4096)
       if not data:
-        print('Server connection killed.')
+        self.tout.text = 'Server connection killed.'
       else:
         self.tout.text += '\n' + self.enc.decrypt(data)
 
 
   def send_msg(self):
-    self.client.send(self.enc.encrypt(self.tin.text))
+    if self.tin.text.startswith('#passwd '):
+      self.enc = AESCipher(self.tin.text[8:])
+
+    elif self.tin.text == '/exit':
+      sys.exit()
+
+    else:
+      self.client.send(self.enc.encrypt(self.tin.text))
+      
+    self.tin.text = ''
+    self.tin.focus = True
 
 class Manager(ScreenManager):
   pass
