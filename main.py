@@ -20,45 +20,49 @@ class Chat(Widget):
 
     self.client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     self.client.settimeout(2)
-    server_addr = ('localhost', 46643)
 
-    #passwd = input('Please enter the server password now, or press enter for none: ')
-    passwd = ''
+    self.enc = AESCipher('')
 
-    self.enc = AESCipher(passwd)
-
-    try:
-      self.client.connect(server_addr)
-    except:
-      print('Unable to establish connection')
+    self.connected = 0
 
     Clock.schedule_interval(self.chat_client, 0)
 
   def chat_client(self,e):
     self.tin.focus = True
 
-    readable, writable, exception = select.select([self.client],[],[],0)
+    if self.connected:
+      readable, writable, exception = select.select([self.client],[],[],0)
 
-    if self.client in readable:
-      data = self.client.recv(4096)
-      if not data:
-        self.tout.text = 'Server connection killed.'
-      else:
-        self.tout.text += '\n' + self.enc.decrypt(data)
-
+      if self.client in readable:
+        data = self.client.recv(4096)
+        if not data:
+          self.tout.text = 'Server connection killed.'
+        else:
+          try:
+            self.tout.text += '\n' + self.enc.decrypt(data)
+          except:
+            pass
 
   def send_msg(self):
-    if self.tin.text.startswith('#passwd '):
-      self.enc = AESCipher(self.tin.text[8:])
+    text = self.tin.text
+    if text.startswith('#passwd '):
+      self.enc = AESCipher(text[8:])
 
-    elif self.tin.text == '/exit':
+    elif text.startswith('#connect '):
+      try:
+        self.client.connect((text.split(' ')[1], int(text.split(' ')[2])))
+        self.connected = 1
+      except:
+        self.tout.text += '\nConnection to {}:{} failed.'.format(text.split(' ')[1], text.split(' ')[2])
+        self.connected = 0
+
+    elif text == '/exit':
       sys.exit()
 
     else:
-      self.client.send(self.enc.encrypt(self.tin.text))
-      
+      self.client.send(self.enc.encrypt(text))
+
     self.tin.text = ''
-    self.tin.focus = True
 
 class Manager(ScreenManager):
   pass

@@ -58,7 +58,10 @@ def chat_server():
           continue
 
         if data:
-          if plaintext.startswith('/nick '):
+          if plaintext.startswith('/help'):
+            s.send(enc.encrypt('/nick <nickname> - change nickname'))
+
+          elif plaintext.startswith('/nick '):
             broadcast(s,'{} changed their nickname to {}'.format(nicknames[s],plaintext[6:]))
             nicknames[s] = plaintext[6:].strip()
 
