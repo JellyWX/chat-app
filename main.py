@@ -8,17 +8,8 @@ from kivy.clock import Clock
 import select
 import socket
 import sys
-#try:
+
 from encrypt import AESCipher
-#except ImportError:
-#  print('Windows Compatibility mode enabled. You will be UNABLE to connect to secured servers!')
-#  class AESCipher():
-#    def __init__(self,passw):
-#      pass
-#    def encrypt(msg):
-#      return msg.encode()
-#    def decrypt(msg):
-#      return msg.decode()
 
 class Chat(Widget):
   tout = ObjectProperty(None)

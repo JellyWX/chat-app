@@ -18,22 +18,22 @@ enc = AESCipher(passwd)
 
 server.listen(12)
 
-SOCKS = [server]
+socks = [server]
 
 nicknames = {}
 
 def chat_server():
 
-  global SOCKS, nicknames, passwd
-  while SOCKS:
+  global socks, nicknames, passwd
+  while socks:
 
-    readable, writable, exception = select.select(SOCKS,[],[],0)
+    readable, writable, exception = select.select(socks,[],[],0)
 
     for s in readable:
 
       if s == server:
         sock, addr = server.accept()
-        SOCKS.append(sock)
+        socks.append(sock)
         print('{} connected to server'.format(addr))
 
         nicknames[sock] = addr
@@ -46,8 +46,8 @@ def chat_server():
         except ConnectionResetError:
           broadcast(s,'{} killed the connection'.format(nicknames[s]))
           print('{} killed the connection'.format(nicknames[s]))
-          if s in SOCKS:
-            SOCKS.remove(s)
+          if s in socks:
+            socks.remove(s)
           s.close()
           continue
 
@@ -70,29 +70,29 @@ def chat_server():
         else:
           broadcast(s,'{} killed the connection'.format(nicknames[s]))
           print('{} killed the connection\n'.format(nicknames[s]))
-          if s in SOCKS:
-            SOCKS.remove(s)
+          if s in socks:
+            socks.remove(s)
           s.close()
 
     for s in exception:
       broadcast(s,'{} killed the connection'.format(nicknames[s]))
       print('{} killed the connection'.format(nicknames[s]))
-      if s in SOCKS:
-        SOCKS.remove(s)
+      if s in socks:
+        socks.remove(s)
       s.close()
 
 
 def broadcast(sock,message):
-  global server, SOCKS
+  global server, socks
 
-  for s in SOCKS:
+  for s in socks:
     if s != server:
       try:
         s.send(enc.encrypt(message))
       except:
         s.close()
-        if s in SOCKS:
-          SOCKS.remove(s)
+        if s in socks:
+          socks.remove(s)
 
 
 chat_server()
