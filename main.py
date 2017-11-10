@@ -1,4 +1,5 @@
 from kivy.app import App
+from kivy.lang.builder import Builder
 from kivy.uix.screenmanager import ScreenManager
 from kivy.properties import ObjectProperty
 from kivy.uix.widget import Widget
@@ -70,6 +71,41 @@ class Manager(ScreenManager):
 
 class Main(App):
   def build(self):
+    Builder.load_string('''
+<Chat>:
+  tout: tout
+  tin: tin
+  send_btn: send_btn
+
+  TextInput:
+    id: tout
+    width: root.width
+    height: root.height * 0.94
+    y: root.height * 0.06
+    text: "Use #connect <ip> <port> to connect to a server. Use the command `/help` to view a server's commands. Use #passwd <password> if the server you're connected to has encryption."
+
+  TextInput:
+    id: tin
+    focus: True
+    multiline: False
+    width: root.width * 0.9
+    height: root.height * 0.06
+    on_text_validate: root.send_msg()
+
+  Button:
+    id: send_btn
+    width: root.width * 0.1
+    height: root.height * 0.06
+    x: root.width * 0.9
+    text: 'Send'
+    on_press: root.send_msg()
+
+<Manager>:
+
+  Screen:
+    name: 'chat'
+    Chat:
+      id: chat''')
     return Manager()
 
 Main().run()
