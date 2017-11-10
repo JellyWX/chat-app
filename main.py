@@ -8,17 +8,17 @@ from kivy.clock import Clock
 import select
 import socket
 import sys
-try:
-  from encrypt import AESCipher
-except ImportError:
-  print('Windows Compatibility mode enabled. You will be UNABLE to connect to secured servers!')
-  class AESCipher():
-    def __init__(self,passw):
-      pass
-    def encrypt(msg):
-      return msg.encode()
-    def decrypt(msg):
-      return msg.decode()
+#try:
+from encrypt import AESCipher
+#except ImportError:
+#  print('Windows Compatibility mode enabled. You will be UNABLE to connect to secured servers!')
+#  class AESCipher():
+#    def __init__(self,passw):
+#      pass
+#    def encrypt(msg):
+#      return msg.encode()
+#    def decrypt(msg):
+#      return msg.decode()
 
 class Chat(Widget):
   tout = ObjectProperty(None)
@@ -66,10 +66,10 @@ class Chat(Widget):
         self.tout.text += '\nConnection to {}:{} failed.'.format(text.split(' ')[1], text.split(' ')[2])
         self.connected = 0
 
-    elif text == '/exit':
+    elif text == '#exit':
       sys.exit()
 
-    else:
+    elif self.connected:
       self.client.send(self.enc.encrypt(text))
 
     self.tin.text = ''
