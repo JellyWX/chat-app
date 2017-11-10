@@ -63,7 +63,7 @@ class Chat(Widget):
         self.client.connect((text.split(' ')[1], int(text.split(' ')[2])))
         self.connected = 1
       except:
-        self.tout.text += '\nConnection to {}:{} failed.'.format(text.split(' ')[1], text.split(' ')[2])
+        self.tout.text += '\nConnection to {}:{} failed. If you\'ve already connected to a server, try restarting your client.'.format(text.split(' ')[1], text.split(' ')[2])
         self.connected = 0
 
     elif text == '#exit':
